@@ -28,9 +28,9 @@ app.config['SECRET_KEY']='mysecretkey'
 def connect_db():                                       ##
     conn=psycopg2.connect(                              ##
         port=5432,                                      ##
-        user='murali',                                  ##
-        database='devcomm',                             ##
-        password='Sivapt@64',                           ##
+        user='',                                        ##
+        database='',                                    ##
+        password='',                                    ##
         host='127.0.0.1'                                ##
     )                                                   ##
     return conn                                         ##
