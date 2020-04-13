@@ -1,0 +1,131 @@
+<html>
+    <head>
+        <title> HAHAHAHA</title>
+        <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+        <script>
+          var title='';
+          function haha (){
+               var val=$('#sea').val();
+               
+               $.ajax({ 
+                   url:'http://www.omdbapi.com/?apikey=33f65fe7&t='+ val + '',
+                   type:'GET',
+                   dataType:'json',
+                   success:function(data){
+                        
+                        if (data.Title != undefined){
+                          title=data.Title;  
+                       $('#hello').html(" <div class='jumbotron'> <p id='title' >Title:"+data.Title+ "</p><p> Year:"+data.Year+"</p> <p> Rated:"+data.Rated+ "</p> <p> Released:" +data.Released+"</p> <input type='button' id='like' onclick='liked();' value='like' /> </div>");
+                        }
+                        else {
+                          alert("Enter a valid Movie Name")
+                        }
+                      },
+                   error: function( req, status, err ) {
+                    console.log( 'something went wrong', status, err );
+                  }
+               });
+           }
+
+           function liked(){
+             {% if 'username' in session %} 
+             document.getElementById('like').value='Liked';
+             //var title=document.getElementById('title').html;
+             if (title === ''){
+              alert("You can't like twice")
+             }
+             else{
+             alert('You have Liked '+title+'');
+             $.ajax({
+               method:'POST',
+               url:"{{url_for('liked')}}",
+               data:{'title' : title},
+               dataType:'json',
+               success: function(response){
+                 //alert("You have liked the movie and you have been redirected to your movieboard");
+                  if (response.redirect){
+                    window.location.href=response.redirect;
+                  }
+                }
+             });
+             title='';
+             }
+             {% else %} 
+               alert("You Have To LogIn To Like The Movie")
+               window.location.href= '/login'; 
+             {% endif %} 
+             
+             
+           }
+           
+
+           
+       </script>
+
+     
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">SMK's MovieDB</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+          
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mr-auto">
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('index')}}">Home <span class="sr-only">(current)</span></a>
+                </li>
+
+                {% if 'username' in session %}
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('logout')}}">LogOut <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('index')}}"> {{session['username']}} <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('userlikedres')}}"> Liked Movies <span class="sr-only">(current)</span></a>
+                </li>
+ 
+                {% else %}
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('register')}}">Register <span class="sr-only">(current)</span></a>
+                </li>
+                
+                
+
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('login')}}">Login <span class="sr-only">(current)</span></a>
+                </li>
+                {% endif %}
+
+                <li class="nav-item ">
+                  <a class="nav-link" href="{{url_for('movieboard')}}">Movies Board <span class="sr-only">(current)</span></a>
+                </li>
+
+                
+              <form  class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" id="sea" name="search"  placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="button" onclick="haha();" id='btn'>Search</button>
+              </form>
+            </div>
+          </nav>
+
+          <div id="hello" ></div>
+          {% block content %}
+
+          {% endblock %}
+
+          
+
+    </body>
+</html>

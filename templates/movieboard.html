@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<table class="table table-dark">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Movie Title</th>
+        <th scope="col">Count</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for title in titles %}
+      <tr class='entry' id='{{loop.index}}'>
+        <th scope="row">{{loop.index}}</th>
+        <td class="title"  >{{title[0]}}</td>
+        <td>{{title[1]}}</td>
+      </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    $(document).ready(function(){
+        $('tr.entry').click(function(){
+            var id=$(this).attr('id');
+            var entry=$(this).find('.title').text();
+            //alert(entry);
+            $.ajax({
+              url:"http://www.omdbapi.com/?t="+entry+"&apikey=33f65fe7",
+              method:'GET',
+              dataType:'json',
+              success:function(data){
+                        
+                if (data.Title != undefined){
+                title=data.Title;  
+                $('#'+id+'').html(" <div class='jumbotron' style='background-color:#343a40;'  > <p id='title' >Title:"+data.Title+ "</p><p> Year:"+data.Year+"</p> <p> Rated:"+data.Rated+ "</p> <p> Released:" +data.Released+"</p><input type='button' id='like' onclick='liked();' value='like' /> </div>");
+                } 
+              }
+            });
+        });
+    });
+</script>
+{% endblock %}

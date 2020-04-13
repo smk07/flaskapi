@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block content %}
+<script>
+  var title='';
+  function haha (){
+       var val=$('#sea').val();
+       
+       $.ajax({ 
+           url:'http://www.omdbapi.com/?apikey=33f65fe7&t='+ val + '',
+           type:'GET',
+           dataType:'json',
+           success:function(data){
+                if (data.Title != undefined){  
+                //alert(data.Title);
+
+               console.log( data );
+               title=data.Title;
+               $('#hi').html(" <div class='jumbotron'> <p id='title' >Title:"+data.Title+ "</p><p> Year:"+data.Year+"</p> <p> Rated:"+data.Rated+ "</p> <p> Released:" +data.Released+"</p> <input type='button' id='like' onclick='liked();' value='like' /> </div>");
+                }
+                else {
+                  alert("Enter a valid Movie Name")
+                }
+              },
+           error: function( req, status, err ) {
+            console.log( 'something went wrong', status, err );
+          }
+       });
+   }
+
+   function liked(){
+     {% if 'username' in session %} 
+     document.getElementById('like').value='Liked';
+     //var title=document.getElementById('title').html;
+     if (title === ''){
+      alert("You can't like twice")
+     }
+     else{
+     alert('You have Liked '+title+'!');
+     $.ajax({
+       method:'POST',
+       url:"{{url_for('liked')}}",
+       data:{'title' : title},
+       dataType:'json',
+       success: function(response){
+         //alert("You have liked the movie and you have been redirected to your movieboard");
+          if (response.redirect){
+            window.location.href=response.redirect;
+          }
+        }
+     });
+     title='';
+     }
+     {% else %} 
+       alert("You Have To LogIn To Like The Movie")
+       window.location.href= '/login';
+     {% endif %}
+     
+     
+   }
+   
+
+   
+</script>
+
+    {% for mess in get_flashed_messages() %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>{{mess}}</strong> 
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+
+    <div id='hi' class="jumbotron"> Vanakam Da 
+      {% if 'username' in session %}
+        {{session['username']}}
+
+      {% else %}
+        Mapla
+      {% endif %}
+      , Welcome To SMK's Movie DataBase</div>
+
+    
+{% endblock %}
